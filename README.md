@@ -1,4 +1,4 @@
-# invoice-cli
+# invoicegen-cli
 
 A command-line invoice generator for freelancers and small businesses. Create professional PDF invoices, manage clients, and track payment status — all from your terminal.
 
@@ -51,7 +51,7 @@ $ invoice new --client "Acme Corp" \
 ## Installation
 
 ```bash
-npm install -g invoice-cli
+npm install -g invoicegen-cli
 ```
 
 > **Requirements:** Node.js >= 18. Puppeteer (included) downloads Chromium on first install (~170MB).
