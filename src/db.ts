@@ -62,9 +62,15 @@ export async function runMigrations(): Promise<void> {
       t.string("email", 128).nullable();
       t.string("address", 255).nullable();
       t.string("tax_id", 64).nullable();
+      t.string("vat_number", 64).nullable();   // EU VAT number
       t.string("currency", 3).notNullable().defaultTo("USD");
       t.timestamps(true, true);
     });
+  } else {
+    // Add vat_number column if upgrading from older version
+    if (!(await db.schema.hasColumn("clients", "vat_number"))) {
+      await db.schema.alterTable("clients", (t) => t.string("vat_number", 64).nullable());
+    }
   }
 
   if (!(await db.schema.hasTable("invoices"))) {
@@ -73,6 +79,7 @@ export async function runMigrations(): Promise<void> {
       t.string("number", 32).notNullable().unique();
       t.integer("client_id").notNullable().references("id").inTable("clients");
       t.date("date").notNullable();
+      t.date("supply_date").nullable();         // EU: date of supply
       t.date("due_date").notNullable();
       t.string("currency", 3).notNullable().defaultTo("USD");
       t.decimal("subtotal", 12, 2).notNullable().defaultTo(0);
@@ -81,9 +88,17 @@ export async function runMigrations(): Promise<void> {
       t.decimal("total", 12, 2).notNullable().defaultTo(0);
       t.enum("status", ["draft", "sent", "paid", "overdue"]).notNullable().defaultTo("draft");
       t.string("notes", 512).nullable();
+      t.boolean("reverse_charge").notNullable().defaultTo(false); // EU reverse charge
       t.string("pdf_path", 512).nullable();
       t.timestamps(true, true);
     });
+  } else {
+    if (!(await db.schema.hasColumn("invoices", "supply_date"))) {
+      await db.schema.alterTable("invoices", (t) => t.date("supply_date").nullable());
+    }
+    if (!(await db.schema.hasColumn("invoices", "reverse_charge"))) {
+      await db.schema.alterTable("invoices", (t) => t.boolean("reverse_charge").notNullable().defaultTo(false));
+    }
   }
 
   if (!(await db.schema.hasTable("invoice_items"))) {
@@ -105,7 +120,8 @@ export interface Client {
   name: string;
   email?: string | null;
   address?: string | null;
-  tax_id?: string | null;
+  tax_id?: string | null;       // VAT/Tax ID of the client (required for EU B2B)
+  vat_number?: string | null;   // EU VAT number (e.g. DE123456789)
   currency: string;
 }
 
@@ -123,6 +139,7 @@ export interface Invoice {
   number: string;
   client_id: number;
   date: string;
+  supply_date?: string | null;  // EU: date of supply (if different from invoice date)
   due_date: string;
   currency: string;
   subtotal: number;
@@ -131,5 +148,6 @@ export interface Invoice {
   total: number;
   status: "draft" | "sent" | "paid" | "overdue";
   notes?: string | null;
+  reverse_charge?: boolean;     // EU: cross-border B2B reverse charge notice
   pdf_path?: string | null;
 }

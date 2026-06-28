@@ -34,6 +34,7 @@ export interface AppConfig {
     email: string;
     address: string;
     taxId: string;
+    vatNumber: string;   // EU VAT number of the sender (e.g. DE123456789)
   };
   defaultCurrency: string;
   outputDir: string;
@@ -60,6 +61,7 @@ export function getConfig(): AppConfig {
       email: process.env["SENDER_EMAIL"] ?? "",
       address: process.env["SENDER_ADDRESS"] ?? "",
       taxId: process.env["SENDER_TAX_ID"] ?? "",
+      vatNumber: process.env["SENDER_VAT_NUMBER"] ?? "",
     },
     defaultCurrency: (process.env["DEFAULT_CURRENCY"] ?? "USD").toUpperCase(),
     outputDir: process.env["OUTPUT_DIR"] ?? "./invoices",

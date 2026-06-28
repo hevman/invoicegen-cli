@@ -6,6 +6,7 @@ export interface ClientAddOptions {
   email?: string;
   address?: string;
   taxId?: string;
+  vatNumber?: string;
   currency: string;
 }
 
@@ -24,16 +25,18 @@ export async function addClient(opts: ClientAddOptions): Promise<void> {
     email: opts.email ?? null,
     address: opts.address ?? null,
     tax_id: opts.taxId ?? null,
+    vat_number: opts.vatNumber ?? null,
     currency: opts.currency.toUpperCase(),
   });
 
   console.log(
     `\n  ✔  Client added  ${chalk.gray(`#${id}`)}\n` +
-    `     Name:      ${chalk.cyan(opts.name)}\n` +
-    (opts.email   ? `     Email:     ${chalk.gray(opts.email)}\n` : "") +
-    (opts.address ? `     Address:   ${chalk.gray(opts.address)}\n` : "") +
-    (opts.taxId   ? `     Tax ID:    ${chalk.gray(opts.taxId)}\n` : "") +
-    `     Currency:  ${chalk.yellow(opts.currency.toUpperCase())}\n`
+    `     Name:       ${chalk.cyan(opts.name)}\n` +
+    (opts.email     ? `     Email:      ${chalk.gray(opts.email)}\n` : "") +
+    (opts.address   ? `     Address:    ${chalk.gray(opts.address)}\n` : "") +
+    (opts.taxId     ? `     Tax ID:     ${chalk.gray(opts.taxId)}\n` : "") +
+    (opts.vatNumber ? `     VAT No:     ${chalk.gray(opts.vatNumber)}\n` : "") +
+    `     Currency:   ${chalk.yellow(opts.currency.toUpperCase())}\n`
   );
 }
 

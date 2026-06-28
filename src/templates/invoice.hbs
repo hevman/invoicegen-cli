@@ -16,12 +16,14 @@
     .status-paid     { background: #dcfce7; color: #16a34a; }
     .status-overdue  { background: #fee2e2; color: #dc2626; }
 
-    .parties { display: flex; justify-content: space-between; margin-bottom: 40px; }
+    .parties { display: flex; justify-content: space-between; margin-bottom: 40px; gap: 40px; }
+    .party { flex: 1; }
     .party h3 { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 10px; }
     .party p  { line-height: 1.7; color: #374151; }
     .party .name { font-weight: 600; font-size: 15px; color: #1a1a2e; }
+    .party .meta { font-size: 11px; color: #9ca3af; }
 
-    .dates { display: flex; gap: 40px; background: #f9fafb; border-radius: 10px; padding: 18px 24px; margin-bottom: 32px; }
+    .dates { display: flex; gap: 32px; background: #f9fafb; border-radius: 10px; padding: 18px 24px; margin-bottom: 32px; flex-wrap: wrap; }
     .date-item label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; display: block; margin-bottom: 4px; }
     .date-item span  { font-weight: 600; color: #1a1a2e; }
 
@@ -37,11 +39,12 @@
     tbody td:nth-child(3) { text-align: center; color: #6b7280; }
 
     .totals { display: flex; justify-content: flex-end; margin-bottom: 40px; }
-    .totals-box { width: 280px; }
+    .totals-box { width: 300px; }
     .totals-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; }
     .totals-row.total { border-top: 2px solid #1a1a2e; border-bottom: none; margin-top: 4px; padding-top: 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; }
     .totals-row.total .label { color: #1a1a2e; }
 
+    .notice { background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 14px 18px; margin-bottom: 20px; font-size: 12px; color: #92400e; }
     .notes { background: #f9fafb; border-left: 4px solid #4f46e5; border-radius: 6px; padding: 16px 20px; margin-bottom: 40px; }
     .notes h4 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 8px; }
     .notes p  { color: #374151; line-height: 1.6; }
@@ -52,34 +55,53 @@
 </head>
 <body>
 
+  <!-- Header: Sender info + Invoice number -->
   <div class="header">
     <div>
       <div class="brand">{{sender.name}}</div>
       {{#if sender.email}}<div style="color:#6b7280;margin-top:4px;">{{sender.email}}</div>{{/if}}
       {{#if sender.address}}<div style="color:#6b7280;">{{sender.address}}</div>{{/if}}
-      {{#if sender.taxId}}<div style="color:#6b7280;">Tax ID: {{sender.taxId}}</div>{{/if}}
+      {{#if sender.taxId}}<div style="color:#9ca3af;font-size:11px;margin-top:2px;">Tax ID: {{sender.taxId}}</div>{{/if}}
+      {{#if sender.vatNumber}}<div style="color:#9ca3af;font-size:11px;">VAT: {{sender.vatNumber}}</div>{{/if}}
     </div>
     <div class="invoice-meta">
+      <div style="color:#9ca3af;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Invoice</div>
       <div class="invoice-number">{{invoice.number}}</div>
       <div><span class="status status-{{invoice.status}}">{{invoice.status}}</span></div>
     </div>
   </div>
 
+  <!-- Bill From / Bill To -->
   <div class="parties">
+    <div class="party">
+      <h3>From</h3>
+      <p class="name">{{sender.name}}</p>
+      {{#if sender.address}}<p>{{sender.address}}</p>{{/if}}
+      {{#if sender.taxId}}<p class="meta">Tax ID: {{sender.taxId}}</p>{{/if}}
+      {{#if sender.vatNumber}}<p class="meta">VAT No: {{sender.vatNumber}}</p>{{/if}}
+    </div>
     <div class="party">
       <h3>Bill To</h3>
       <p class="name">{{client.name}}</p>
       {{#if client.email}}<p>{{client.email}}</p>{{/if}}
       {{#if client.address}}<p>{{client.address}}</p>{{/if}}
-      {{#if client.tax_id}}<p>Tax ID: {{client.tax_id}}</p>{{/if}}
+      {{#if client.tax_id}}<p class="meta">Tax ID: {{client.tax_id}}</p>{{/if}}
+      {{#if client.vat_number}}<p class="meta">VAT No: {{client.vat_number}}</p>{{/if}}
     </div>
   </div>
 
+  <!-- Dates -->
   <div class="dates">
     <div class="date-item">
       <label>Invoice Date</label>
       <span>{{invoice.date}}</span>
     </div>
+    {{#if invoice.supply_date}}
+    <div class="date-item">
+      <label>Supply Date</label>
+      <span>{{invoice.supply_date}}</span>
+    </div>
+    {{/if}}
     <div class="date-item">
       <label>Due Date</label>
       <span>{{invoice.due_date}}</span>
@@ -90,13 +112,14 @@
     </div>
   </div>
 
+  <!-- Line items -->
   <table>
     <thead>
       <tr>
         <th style="width:50%">Description</th>
-        <th style="width:15%">Qty</th>
+        <th style="width:13%">Qty</th>
         <th style="width:20%">Unit Price</th>
-        <th style="width:15%">Total</th>
+        <th style="width:17%">Total</th>
       </tr>
     </thead>
     <tbody>
@@ -111,25 +134,40 @@
     </tbody>
   </table>
 
+  <!-- Totals -->
   <div class="totals">
     <div class="totals-box">
       <div class="totals-row">
-        <span class="label">Subtotal</span>
+        <span class="label">Subtotal (net)</span>
         <span>{{subtotal_fmt}}</span>
       </div>
       {{#if hasTax}}
       <div class="totals-row">
-        <span class="label">Tax ({{invoice.tax_rate}}%)</span>
+        <span class="label">VAT / Tax ({{invoice.tax_rate}}%)</span>
         <span>{{tax_fmt}}</span>
       </div>
       {{/if}}
+      {{#if invoice.reverse_charge}}
+      <div class="totals-row">
+        <span class="label">VAT</span>
+        <span style="color:#f59e0b;">Reverse charge</span>
+      </div>
+      {{/if}}
       <div class="totals-row total">
-        <span class="label">Total</span>
+        <span class="label">Total Due</span>
         <span class="accent">{{total_fmt}}</span>
       </div>
     </div>
   </div>
 
+  <!-- Reverse charge notice (EU cross-border B2B) -->
+  {{#if invoice.reverse_charge}}
+  <div class="notice">
+    <strong>VAT Reverse Charge:</strong> The VAT/tax liability is transferred to the recipient of the supply (Art. 196 EU VAT Directive 2006/112/EC).
+  </div>
+  {{/if}}
+
+  <!-- Notes -->
   {{#if invoice.notes}}
   <div class="notes">
     <h4>Notes</h4>

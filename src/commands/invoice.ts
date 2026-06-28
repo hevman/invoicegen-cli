@@ -6,12 +6,14 @@ import { generatePdf, nextInvoiceNumber, fmt } from "../pdf.js";
 
 export interface NewInvoiceOptions {
   client: string;
-  items: string[];        // "Description:qty:price"
+  items: string[];
   taxRate: string;
   currency?: string;
-  dueIn: string;          // days
+  dueIn: string;
   notes?: string;
   date?: string;
+  supplyDate?: string;
+  reverseCharge: boolean;
   output?: string;
   noPdf: boolean;
 }
@@ -76,6 +78,7 @@ export async function newInvoice(opts: NewInvoiceOptions): Promise<void> {
     number: invoiceNumber,
     client_id: clientRow.id,
     date,
+    supply_date: opts.supplyDate ?? null,
     due_date: dueDateStr,
     currency,
     subtotal,
@@ -84,6 +87,7 @@ export async function newInvoice(opts: NewInvoiceOptions): Promise<void> {
     total,
     status: "draft",
     notes: opts.notes ?? null,
+    reverse_charge: opts.reverseCharge,
     pdf_path: null,
   } as Omit<Invoice, "id">);
 

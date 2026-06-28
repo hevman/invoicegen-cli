@@ -26,10 +26,11 @@ clientCmd
   .requiredOption("-n, --name <name>", "Client name")
   .option("-e, --email <email>", "Client email")
   .option("-a, --address <address>", "Client address")
-  .option("--tax-id <id>", "Client tax ID / VAT number")
+  .option("--tax-id <id>", "Client tax ID")
+  .option("--vat-number <vat>", "Client EU VAT number (e.g. DE123456789)")
   .option("--currency <code>", "Default currency for this client", "USD")
   .action(async (opts) => {
-    await addClient({ name: opts.name, email: opts.email, address: opts.address, taxId: opts.taxId, currency: opts.currency });
+    await addClient({ name: opts.name, email: opts.email, address: opts.address, taxId: opts.taxId, vatNumber: opts.vatNumber, currency: opts.currency });
     await closeDb();
   });
 
@@ -52,6 +53,8 @@ program
   .option("--due-in <days>", "Payment due in N days", "30")
   .option("--notes <text>", "Notes printed on invoice")
   .option("--date <YYYY-MM-DD>", "Invoice date (defaults to today)")
+  .option("--supply-date <YYYY-MM-DD>", "Date of supply — required for EU VAT invoices when different from invoice date")
+  .option("--reverse-charge", "Add EU VAT reverse charge notice (cross-border B2B)")
   .option("-o, --output <filename>", "PDF output filename")
   .option("--no-pdf", "Skip PDF generation, save to DB only")
   .action(async (opts) => {
@@ -63,6 +66,8 @@ program
       dueIn: opts.dueIn,
       notes: opts.notes,
       date: opts.date,
+      supplyDate: opts.supplyDate,
+      reverseCharge: opts.reverseCharge ?? false,
       output: opts.output,
       noPdf: !opts.pdf,
     });
