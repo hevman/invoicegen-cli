@@ -1,0 +1,54 @@
+{
+  "name": "invoice-cli",
+  "version": "1.0.0",
+  "description": "A command-line invoice generator — create professional PDF invoices, manage clients and track history. Supports SQLite, PostgreSQL, MySQL and MSSQL.",
+  "main": "dist/index.js",
+  "bin": {
+    "invoice": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc && npm run copy-templates",
+    "copy-templates": "node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync('dist/templates',{recursive:true});fs.copyFileSync('src/templates/invoice.hbs','dist/templates/invoice.hbs');\"",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "invoice",
+    "cli",
+    "pdf",
+    "freelance",
+    "billing",
+    "typescript",
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "mssql"
+  ],
+  "author": "hevman",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "handlebars": "^4.7.8",
+    "knex": "^3.1.0",
+    "better-sqlite3": "^11.1.2",
+    "puppeteer": "^22.0.0"
+  },
+  "optionalDependencies": {
+    "pg": "^8.12.0",
+    "mysql2": "^3.10.0",
+    "tedious": "^18.6.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/handlebars": "^4.1.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0",
+    "ts-node": "^10.9.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

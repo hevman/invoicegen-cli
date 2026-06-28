@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #fff; padding: 48px 56px; }
+
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; }
+    .brand { font-size: 28px; font-weight: 700; color: #1a1a2e; letter-spacing: -0.5px; }
+    .invoice-meta { text-align: right; }
+    .invoice-meta .invoice-number { font-size: 22px; font-weight: 700; color: #4f46e5; }
+    .invoice-meta .status { display: inline-block; margin-top: 6px; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-draft    { background: #f3f4f6; color: #6b7280; }
+    .status-sent     { background: #dbeafe; color: #1d4ed8; }
+    .status-paid     { background: #dcfce7; color: #16a34a; }
+    .status-overdue  { background: #fee2e2; color: #dc2626; }
+
+    .parties { display: flex; justify-content: space-between; margin-bottom: 40px; }
+    .party h3 { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 10px; }
+    .party p  { line-height: 1.7; color: #374151; }
+    .party .name { font-weight: 600; font-size: 15px; color: #1a1a2e; }
+
+    .dates { display: flex; gap: 40px; background: #f9fafb; border-radius: 10px; padding: 18px 24px; margin-bottom: 32px; }
+    .date-item label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; display: block; margin-bottom: 4px; }
+    .date-item span  { font-weight: 600; color: #1a1a2e; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+    thead th { background: #1a1a2e; color: #fff; padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    thead th:last-child  { text-align: right; }
+    thead th:nth-child(2),
+    thead th:nth-child(3) { text-align: center; }
+    tbody tr:nth-child(even) { background: #f9fafb; }
+    tbody td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; color: #374151; vertical-align: top; }
+    tbody td:last-child  { text-align: right; font-weight: 500; }
+    tbody td:nth-child(2),
+    tbody td:nth-child(3) { text-align: center; color: #6b7280; }
+
+    .totals { display: flex; justify-content: flex-end; margin-bottom: 40px; }
+    .totals-box { width: 280px; }
+    .totals-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; }
+    .totals-row.total { border-top: 2px solid #1a1a2e; border-bottom: none; margin-top: 4px; padding-top: 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; }
+    .totals-row.total .label { color: #1a1a2e; }
+
+    .notes { background: #f9fafb; border-left: 4px solid #4f46e5; border-radius: 6px; padding: 16px 20px; margin-bottom: 40px; }
+    .notes h4 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 8px; }
+    .notes p  { color: #374151; line-height: 1.6; }
+
+    .footer { text-align: center; color: #9ca3af; font-size: 11px; padding-top: 24px; border-top: 1px solid #f3f4f6; }
+    .accent { color: #4f46e5; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <div class="brand">{{sender.name}}</div>
+      {{#if sender.email}}<div style="color:#6b7280;margin-top:4px;">{{sender.email}}</div>{{/if}}
+      {{#if sender.address}}<div style="color:#6b7280;">{{sender.address}}</div>{{/if}}
+      {{#if sender.taxId}}<div style="color:#6b7280;">Tax ID: {{sender.taxId}}</div>{{/if}}
+    </div>
+    <div class="invoice-meta">
+      <div class="invoice-number">{{invoice.number}}</div>
+      <div><span class="status status-{{invoice.status}}">{{invoice.status}}</span></div>
+    </div>
+  </div>
+
+  <div class="parties">
+    <div class="party">
+      <h3>Bill To</h3>
+      <p class="name">{{client.name}}</p>
+      {{#if client.email}}<p>{{client.email}}</p>{{/if}}
+      {{#if client.address}}<p>{{client.address}}</p>{{/if}}
+      {{#if client.tax_id}}<p>Tax ID: {{client.tax_id}}</p>{{/if}}
+    </div>
+  </div>
+
+  <div class="dates">
+    <div class="date-item">
+      <label>Invoice Date</label>
+      <span>{{invoice.date}}</span>
+    </div>
+    <div class="date-item">
+      <label>Due Date</label>
+      <span>{{invoice.due_date}}</span>
+    </div>
+    <div class="date-item">
+      <label>Currency</label>
+      <span>{{invoice.currency}}</span>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50%">Description</th>
+        <th style="width:15%">Qty</th>
+        <th style="width:20%">Unit Price</th>
+        <th style="width:15%">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td>{{this.description}}</td>
+        <td>{{this.quantity}}</td>
+        <td>{{this.unit_price_fmt}}</td>
+        <td>{{this.total_fmt}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div class="totals-box">
+      <div class="totals-row">
+        <span class="label">Subtotal</span>
+        <span>{{subtotal_fmt}}</span>
+      </div>
+      {{#if hasTax}}
+      <div class="totals-row">
+        <span class="label">Tax ({{invoice.tax_rate}}%)</span>
+        <span>{{tax_fmt}}</span>
+      </div>
+      {{/if}}
+      <div class="totals-row total">
+        <span class="label">Total</span>
+        <span class="accent">{{total_fmt}}</span>
+      </div>
+    </div>
+  </div>
+
+  {{#if invoice.notes}}
+  <div class="notes">
+    <h4>Notes</h4>
+    <p>{{invoice.notes}}</p>
+  </div>
+  {{/if}}
+
+  <div class="footer">
+    Thank you for your business — generated with <span class="accent">invoice-cli</span>
+  </div>
+
+</body>
+</html>
