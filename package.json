@@ -1,10 +1,10 @@
 {
-  "name": "invoice-cli",
+  "name": "invoicegen-cli",
   "version": "1.0.0",
   "description": "A command-line invoice generator — create professional PDF invoices, manage clients and track history. Supports SQLite, PostgreSQL, MySQL and MSSQL.",
   "main": "dist/index.js",
   "bin": {
-    "invoice": "./dist/cli.js"
+    "invoice": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc && npm run copy-templates",
